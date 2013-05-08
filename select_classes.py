@@ -13,11 +13,13 @@
 # required classes will be selected before classes are prerequisites for fewer #
 # classes.                                                                     #
 #                                                                              #
+# INPUT                                                                        #
+# -----                                                                        #
 # The academic career is given via stdin and consists of one course per line   #
 # with each field of the course separated by a pipe character. The fields are  #
 # as follows:                                                                  #
 #                                                                              #
-# name|code|taken|prereqs|coreqs|offerpattern|offered                          #
+# name|code|taken|prereqs|coreqs|offerpattern|offered|credits                  #
 # No field may contain a pipe character as part of its value.                  #
 #                                                                              #
 # 'name' -- the name of this course. It is used for display purposes only.     #
@@ -42,38 +44,68 @@
 # offered), the course is given extremely high precedence.                     #
 # 'offered' -- indicates whether the course is currently being offered. It     #
 # must be either "yes" or "no".                                                #
+# 'credits' -- the number of credits that this course is worth.                #
+#                                                                              #
+# OUTPUT                                                                       #
+# ------                                                                       #
+# The output of the program is a list of course codes that represent the       #
+# selected courses. There is one course code per line. Every line, including   #
+# the last one, contains on EOL character.                                     #
 ################################################################################
 
 import sys
 
-COURSE_RECORD_COUNT = 7
+COURSE_RECORD_COUNT = 8
+
+MIN_CREDS = 12 # TODO: Make this a program parameter
+MAX_CREDS = 18 # TODO: Make this a program parameter
 
 def main():
     """Execute the program. Call only if this module is being run from the
     interpreter.
     """
     career = read_acedemic_career()
-    semester = select_courses(classes)
+    semester = select_courses(classes, MIN_CREDS, MAX_CREDS)
     write_semester_courses(semester)
 
 def read_academic_career():
     """Read the academic career from stdin. Return the academic career as a list
-    of dekky.schedule.Course instances.
+    of course dicts.
     """
     courses = list()
-    input = open(sys.stdin, 'r')
-    for line in input:
+    stdin = open(sys.stdin, 'r')
+    for line in stdin:
         c = parse_course(line.rstrip('\r\n')
         if c is not None:
             courses.append(c)
     return courses
+
+def select_courses(classes, min_credits, max_credits):
+    """Choose courses based on how critical they are to the academic career.
+    clases -- the classes in the acedemic career.
+    min_credits -- the minimum number of credits in a semester.
+    max_credits -- the maximum number of credits in a semester.
+    Return a list of course codes that represent the selected courses.
+    """
+    selected = list()
+    return selected
+    
+
+def write_semester_courses(semester):
+    """Write the given courses to stdout.
+    semester -- a list of course dicts that give info on the courses to be taken
+    this semester.
+    """
+    stdout = open(sys.stdout, 'w')
+    for s in semester:
+        stdout.write(s['code'])
+        stdout.write('\n')
     
 def parse_course(course_line):
-    """Parse a line of course information into a dekky.schedule.Course instance.
+    """Parse a line of course information into a map containing the data.
     course_line -- the course information to be parsed. Must not contain newline
     character.
-    Return the course as an instance of dekky.schedule.Course if it is valid, or
-    None if it is not valid.
+    Return the dict with course data, or None if it is not valid.
     """
     parts = course_line.split('|')
     if len(parts) != COURSE_RECORD_COUNT:
@@ -95,7 +127,10 @@ def parse_course(course_line):
         offered = False
     else:
         return None
-    
+    credits = int(parts[7])
+    return {'name': name, 'abbr': abbr, 'taken': taken, 'prereqs': prereqs,
+                    'coreqs': coreqs, 'pattern': pattern, 'offered': offered,
+                    'credits': credits}
     
 
 if __name__ == "__main__":
