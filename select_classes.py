@@ -103,11 +103,22 @@ def select_courses(classes, min_credits, max_credits):
     sorted_courses = dekky.list.index_dict_list(classes, 'code')
     # impact scores determine whether to take class.
     # at end of analysis, highest scoring courses are selected.
-    scores1 = analyze_prereqs(sorted_courses)
-    scores2 = analyze_eligibility(sorted_courses)
-    scores3 = analyze_offer_schedules(sorted_courses)
-    
+    prereq_scores = analyze_prereqs(sorted_courses)
+    eligibility_scores = analyze_eligibility(sorted_courses)
+    schedule_scores = analyze_offer_schedules(sorted_courses)
+    combine_scores((prereq_scores, combine_scores), (eligibility_scores))
     return selected
+
+def combine_scores(scores_list, eligibility_scores_list):
+    """Combine all score maps in scores list, keeping only the ones with
+    positive values across all eligibility_scores.
+    """
+    master_eligibilities = {}
+    for scores in eligibilitie_scores_list:
+        for k, v in scores:
+            master
+    for scores in scores_list:
+        
 
 def analyze_offer_schedules(courses):
     """Score courses based on how infrequently they're offered."""
