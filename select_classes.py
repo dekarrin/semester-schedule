@@ -62,6 +62,16 @@ COURSE_RECORD_COUNT = 8
 MIN_CREDS = 12 # TODO: Make this a program parameter
 MAX_CREDS = 18 # TODO: Make this a program parameter
 
+SCHEDULE_SEMESTER = 1
+SCHEDULE_FALL = 2
+SCHEDULE_SPRING = 3
+SCHEDULE_SPECIAL = 4
+
+WEIGHT_SEMESTER = 0
+WEIGHT_FALL_ONLY = 3
+WEIGHT_SPRING_ONLY = 3
+WEIGHT_SPECIAL = 5
+
 def main():
     """Execute the program. Call only if this module is being run from the
     interpreter.
@@ -94,8 +104,50 @@ def select_courses(classes, min_credits, max_credits):
     # impact scores determine whether to take class.
     # at end of analysis, highest scoring courses are selected.
     scores1 = analyze_prereqs(sorted_courses)
-    return selected
+    scores2 = analyze_eligibility(sorted_courses)
+    scores3 = analyze_offer_schedules(sorted_courses)
     
+    return selected
+
+def analyze_offer_schedules(courses):
+    """Score courses based on how infrequently they're offered."""
+    scores = {}
+    for k, c in courses.items():
+        if c['pattern'] == SCHEDULE_SEMESTER:
+            scores[k] == WEIGHT_SEMESTER
+        elif c['pattern'] == SCHEDULE_FALL:
+            scores[k] == WEIGHT_FALL
+        elif c['pattern'] == SCHEDULE_SPRING:
+            scores[k] == WEIGHT_SPRING
+        elif c['pattern'] == SCHEDULE_SPECIAL:
+            scores[k] == WEIGHT_SPECIAL
+        else:
+            raise ValueError
+    return scores
+
+def analyze_eligibility(courses):
+    """Return a list scores that indicate elibility. 1 indicates elibible, -1
+    indicates inelibilty.
+    """
+    scores = {}
+    pre_graph = dekky.graph.create_dep_graph(courses, 'prereqs')
+    for k, c in courses.items():
+        if not c['taken'] and c['offered']:
+            # gotta take prereqs or you're not eligible!
+            deps = dekky.graph.get_dependencies(pre_graph[k], 'taken')
+            is_co = True
+            for deps as d:
+                if d not in c['coreqs']: # Assumes no indirect coreqs
+                    is_co = False
+                    break
+            if not deps or is_co:
+                scores[k] = 1
+            else:
+                scores[k] = -1
+        else:
+            scores[k] = -1
+    return scores
+
 def analyze_prereqs(courses):
     """Analyze the prerequisites of courses and assigns impact scores to each
     course based on how many other courses depend on it.
@@ -110,8 +162,8 @@ def analyze_prereqs(courses):
     scores = {}
     for k in prereqs_graph:
         node = prereqs_graph[k]
-        
-        
+        scores[k] = dekky.graph.count_dependents(node, 'taken')
+    return scores
 
 def write_semester_courses(semester):
     """Write the given courses to stdout.

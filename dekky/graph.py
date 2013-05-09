@@ -46,7 +46,7 @@ def detect_roots(graph):
     return roots
     
 def detect_cycles(graph):
-    """Detects cycles in a graph created with create_dep_graph.
+    """Detect cycles in a graph created with create_dep_graph.
     Return whether there is at least one cycle.
     """
     for k in graph:
@@ -54,7 +54,7 @@ def detect_cycles(graph):
             return True
             
 def detect_single_cycle(node, traversed = None):
-    """Detects cycles using DFS starting from the given node index.
+    """Detect cycles using DFS starting from the given node index.
     Return whether there is at least one cycle.
     """
     if traversed is None:
@@ -70,3 +70,22 @@ def detect_single_cycle(node, traversed = None):
         return False
     else:
         return False
+
+def count_dependents(node, resolution_index):
+    """Return the number of nodes that depend on the given node."""
+    count = len(node['parents'])
+    if node['parents']:
+        for d in node['parents']:
+            if not d['data'][resolution_index]:
+                count += count_dependents(d)
+    return count
+
+def get_dependencies(node, resolution_index):
+    """Return all unresolved dependencies."""
+    deps = list(node['deps'])
+    if node['deps']:
+        for d in node['deps']:
+            if not d['data'][resolution_index]:
+                deps += get_dependencies(d)
+    return count
+
