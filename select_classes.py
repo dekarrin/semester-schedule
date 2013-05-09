@@ -55,6 +55,8 @@
 
 import sys
 
+import dekky.lists
+
 COURSE_RECORD_COUNT = 8
 
 MIN_CREDS = 12 # TODO: Make this a program parameter
@@ -82,14 +84,34 @@ def read_academic_career():
 
 def select_courses(classes, min_credits, max_credits):
     """Choose courses based on how critical they are to the academic career.
-    clases -- the classes in the acedemic career.
+    classes -- the classes in the acedemic career.
     min_credits -- the minimum number of credits in a semester.
     max_credits -- the maximum number of credits in a semester.
     Return a list of course codes that represent the selected courses.
     """
     selected = list()
+    sorted_courses = dekky.list.index_dict_list(classes, 'code')
+    # impact scores determine whether to take class.
+    # at end of analysis, highest scoring courses are selected.
+    scores1 = analyze_prereqs(sorted_courses)
     return selected
     
+def analyze_prereqs(courses):
+    """Analyze the prerequisites of courses and assigns impact scores to each
+    course based on how many other courses depend on it.
+    courses -- the courses to analyze. Must be a dict of course codes to course
+    dicts.
+    Return a dictionary with the course impact scores of this analysis.
+    """
+    prereqs_graph = dekky.graph.create_dep_graph(courses, 'prereqs')
+    prereqs_info = dekky.graph.analyze(prereqs_graph)
+    if not prereqs_info['acyclic']:
+        raise IndexError
+    scores = {}
+    for k in prereqs_graph:
+        node = prereqs_graph[k]
+        
+        
 
 def write_semester_courses(semester):
     """Write the given courses to stdout.
@@ -128,7 +150,7 @@ def parse_course(course_line):
     else:
         return None
     credits = int(parts[7])
-    return {'name': name, 'abbr': abbr, 'taken': taken, 'prereqs': prereqs,
+    return {'name': name, 'code': abbr, 'taken': taken, 'prereqs': prereqs,
                     'coreqs': coreqs, 'pattern': pattern, 'offered': offered,
                     'credits': credits}
     
