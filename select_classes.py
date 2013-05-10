@@ -19,7 +19,7 @@
 # with each field of the course separated by a pipe character. The fields are  #
 # as follows:                                                                  #
 #                                                                              #
-# name|code|taken|prereqs|coreqs|offerpattern|offered|credits|permission       #
+# name|code|taken|prereqs|coreqs|offerpattern|offered|credits|perm|priority    #
 # No field may contain a pipe character as part of its value.                  #
 #                                                                              #
 # 'name' -- the name of this course. It is used for display purposes only.     #
@@ -45,10 +45,14 @@
 # 'offered' -- indicates whether the course is currently being offered. It     #
 # must be either "yes" or "no".                                                #
 # 'credits' -- the number of credits that this course is worth.                #
-# 'permission' -- used for indicating that the student recieved special        #
+# 'perm' -- used for indicating that the student recieved special              #
 # permission to take this course. If set to "yes", eligibility determination   #
 # will be bypassed and the course will be unconditionally eligible. If set to  #
 # "no", normal rules of eligibility apply. Must be either "yes" or "no"        #
+# 'priority' -- this value is added to the impact score during calculation. If #
+# all priority calculation is to be automatic, this must be 0. Otherwise, it   #
+# will complement the calculated value. This will not make an otherwise        #
+# untakable course takable; that is done with the 'perm' field.                #
 #                                                                              #
 # OUTPUT                                                                       #
 # ------                                                                       #
@@ -64,6 +68,7 @@ import dekky.schedule
 
 COURSE_RECORD_COUNT = 9
 
+# NOTE: MIN_CREDS doesn't actually do anything right now
 MIN_CREDS = 12 # TODO: Make this a program parameter
 MAX_CREDS = 18 # TODO: Make this a program parameter
 
@@ -82,7 +87,8 @@ def main():
     interpreter.
     """
     career = read_acedemic_career()
-    semester = select_courses(classes, MIN_CREDS, MAX_CREDS)
+    candidates = build_candidate_list(career)
+    semester = select_courses(candidates, MIN_CREDS, MAX_CREDS)
     write_semester_courses(semester)
 
 def read_academic_career():
@@ -97,15 +103,28 @@ def read_academic_career():
             courses.append(c)
     return courses
 
-def select_courses(classes, min_credits, max_credits):
+def select_courses(candidates, min_credits, max_credits):
     """Choose courses based on how critical they are to the academic career.
-    classes -- the classes in the acedemic career.
+    candidates -- the courses that may be selected from.
     min_credits -- the minimum number of credits in a semester.
     max_credits -- the maximum number of credits in a semester.
     Return a list of course codes that represent the selected courses.
     """
-    selected = list()
-    sorted_courses = dekky.list.index_dict_list(classes, 'code')
+    sorted_candidates = sorted(candidates, key=lambda c: c['impact'])
+    sorted_candidates.reverse()
+    selected = []
+    credits = 0
+    for c in sorted_candidates:
+        if credits + c['credits'] < max_credits:
+            selected.append(c)
+            credits += c['credits']
+    return selected
+    
+def build_candidate_list(courses):
+    """Build list of courses that may be taken this semester.
+    Return a list of the candidate courses, with their 'impact' key set.
+    """
+    sorted_courses = dekky.list.index_dict_list(courses, 'code')
     # impact scores determine whether to take class.
     # at end of analysis, highest scoring courses are selected.
     prereq_scores = dekky.schedule.analyze_prereqs(sorted_courses)
@@ -114,7 +133,9 @@ def select_courses(classes, min_credits, max_credits):
     scores = (prereq_scores, schedule_scores)
     eligibilities = (eligibility_scores,)
     combined = dekky.schedule.combine_impact_scores(scores, eligibilities)
-    return selected
+    candidate_scores = dekky.schedule.drop_ineligible_scores(combined)
+    candidates = dekky.schedule.filter_courses(courses, candidate_scores)
+    return candidates
 
 def write_semester_courses(semester):
     """Write the given courses to stdout.
@@ -161,7 +182,7 @@ def parse_course(course_line):
         return None
     return {'name': name, 'code': abbr, 'taken': taken, 'prereqs': prereqs,
                     'coreqs': coreqs, 'pattern': pattern, 'offered': offered,
-                    'credits': credits, 'permission': perm}
+                    'credits': credits, 'permission': perm, 'impact': 0}
     
 
 if __name__ == "__main__":

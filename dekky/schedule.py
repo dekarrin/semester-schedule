@@ -103,6 +103,25 @@ def analyze_prereqs(courses):
         scores[k] = dekky.graph.count_dependents(node, 'taken')
     return scores
     
+def drop_ineligible_scores(scores):
+    """Return the given list with all scores less than 0 dropped."""
+    eligible = {}
+    for k in scores:
+        if scores[k] >= 0:
+            eligible[k] = scores[k]
+    return eligible
+    
+def filter_courses(courses, scores):
+    """Keep only the courses who have scores and set the kept courses' impact
+    keys to their corresponding scores.
+    """
+    filtered = []
+    for c in courses:
+        if c['code'] in scores
+            c['impact'] = scores[c['code']]
+            filtered.append(c)
+    return filtered
+    
 def course_is_eligible(dep_graph, node_index):
     """Check if a course is eligible to be taken.
     
