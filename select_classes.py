@@ -55,7 +55,9 @@
 
 import sys
 
-import dekky.lists
+import dekky.list
+import dekky.graph
+import dekky.schedule.impacts
 
 COURSE_RECORD_COUNT = 8
 
@@ -109,16 +111,54 @@ def select_courses(classes, min_credits, max_credits):
     combine_scores((prereq_scores, combine_scores), (eligibility_scores))
     return selected
 
-def combine_scores(scores_list, eligibility_scores_list):
-    """Combine all score maps in scores list, keeping only the ones with
-    positive values across all eligibility_scores.
+def combine_scores(scores_list, eligibilities_list):
+    """Combine all score dicts in scores_list and eligibilities_list. If any
+    value in an eligibility score dict is negative, the corresponding value in
+    the resulting score list will also be negative. All score dicts in both
+    scores_list and eligibilities_list must have the exact same keys.
+    Return the combined impact scores of courses.
+    """
+    combined = {}
+    eligibilities = combine_eligibility_scores(eligibilities_list)
+    scores = combine_normal_scores(scores_list)
+    keys = scores.keys()
+    for k in keys:
+        combined[k] = scores[k] * eligibilities[k]
+    return combined
+        
+def combine_normal_scores(scores_list):
+    """Combine scores together. Each key in the dicts of scores_list is added
+    together. All score dicts in scores_list must have the exact same keys, and
+    all score dicts are assumed to only have values greater than or equal to 0.
+    Return the combined impact scores.
+    """
+    master_scores = {}
+    keys = scores_list[0].keys()
+    for k in keys:
+        s = 0
+        for scores in scores_list:
+            s += scores[k]
+        master_scores[k] = s
+    return master_scores
+    
+def combine_eligibility_scores(elgibilities_list):
+    """Combine eligibility scores together. They are assumed to be either +1 or
+    -1. If one of the dicts in eligibilities_list has a key that contains a
+    negative value, that key will be negative in the result. All dicts must have
+    the exact same keys.
+    Return the calulated combined eligibility scores. Each key will contain
+    either +1 or -1.
     """
     master_eligibilities = {}
-    for scores in eligibilitie_scores_list:
-        for k, v in scores:
-            master
-    for scores in scores_list:
-        
+    keys = elgibilities_list[0].keys()
+    for k in keys:
+        s = 1
+        for eligibilities in eligibilities_list:
+            if eligibilities[k] < 0:
+                s = -1
+                break
+        master_eligibilities[k] = s
+    return master_eligibilities
 
 def analyze_offer_schedules(courses):
     """Score courses based on how infrequently they're offered."""
