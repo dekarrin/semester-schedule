@@ -66,7 +66,7 @@ import sys
 import dekky.list
 import dekky.schedule
 
-COURSE_RECORD_COUNT = 9
+COURSE_RECORD_COUNT = 10
 
 # NOTE: MIN_CREDS doesn't actually do anything right now
 MIN_CREDS = 12 # TODO: Make this a program parameter
@@ -180,9 +180,10 @@ def parse_course(course_line):
         perm = False
     else:
         return None
+    prior = int(parts[9])
     return {'name': name, 'code': abbr, 'taken': taken, 'prereqs': prereqs,
                     'coreqs': coreqs, 'pattern': pattern, 'offered': offered,
-                    'credits': credits, 'permission': perm, 'impact': 0}
+                    'credits': credits, 'permission': perm, 'impact': prior}
     
 
 if __name__ == "__main__":

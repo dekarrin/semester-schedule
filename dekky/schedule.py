@@ -118,7 +118,7 @@ def filter_courses(courses, scores):
     filtered = []
     for c in courses:
         if c['code'] in scores
-            c['impact'] = scores[c['code']]
+            c['impact'] += scores[c['code']]
             filtered.append(c)
     return filtered
     
