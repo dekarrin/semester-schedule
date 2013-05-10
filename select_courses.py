@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ################################################################################
-# select_classes.py                                                            #
+# select_courses.py                                                            #
 # -----------------                                                            #
 # Selects classes that should be taken this semester. Classes are selected     #
 # based on which classes have already been taken, which classes are availible, #
