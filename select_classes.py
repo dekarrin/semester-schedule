@@ -19,7 +19,7 @@
 # with each field of the course separated by a pipe character. The fields are  #
 # as follows:                                                                  #
 #                                                                              #
-# name|code|taken|prereqs|coreqs|offerpattern|offered|credits                  #
+# name|code|taken|prereqs|coreqs|offerpattern|offered|credits|permission       #
 # No field may contain a pipe character as part of its value.                  #
 #                                                                              #
 # 'name' -- the name of this course. It is used for display purposes only.     #
@@ -45,6 +45,10 @@
 # 'offered' -- indicates whether the course is currently being offered. It     #
 # must be either "yes" or "no".                                                #
 # 'credits' -- the number of credits that this course is worth.                #
+# 'permission' -- used for indicating that the student recieved special        #
+# permission to take this course. If set to "yes", eligibility determination   #
+# will be bypassed and the course will be unconditionally eligible. If set to  #
+# "no", normal rules of eligibility apply. Must be either "yes" or "no"        #
 #                                                                              #
 # OUTPUT                                                                       #
 # ------                                                                       #
@@ -58,7 +62,7 @@ import sys
 import dekky.list
 import dekky.schedule
 
-COURSE_RECORD_COUNT = 8
+COURSE_RECORD_COUNT = 9
 
 MIN_CREDS = 12 # TODO: Make this a program parameter
 MAX_CREDS = 18 # TODO: Make this a program parameter
@@ -149,9 +153,15 @@ def parse_course(course_line):
     else:
         return None
     credits = int(parts[7])
+    if parts[8] == 'yes':
+        perm = True
+    elif parts[8] == 'no':
+        perm = False
+    else:
+        return None
     return {'name': name, 'code': abbr, 'taken': taken, 'prereqs': prereqs,
                     'coreqs': coreqs, 'pattern': pattern, 'offered': offered,
-                    'credits': credits}
+                    'credits': credits, 'permission': perm}
     
 
 if __name__ == "__main__":

@@ -116,6 +116,8 @@ def course_is_eligible(dep_graph, node_index):
     node_index -- The index in the graph containing the node to be checked.
     """
     c = dep_graph[node_index]['data']
+    if c['permission']:
+        return True
     if not c['taken'] and c['offered']:
         # gotta take prereqs or you're not eligible!
         deps = dekky.graph.get_dependencies(dep_graph[course_index], 'taken')
