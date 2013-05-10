@@ -65,6 +65,7 @@ import sys
 
 import dekky.list
 import dekky.schedule
+import dekky.parse
 
 COURSE_RECORD_COUNT = 10
 
@@ -98,9 +99,10 @@ def read_academic_career():
     courses = list()
     stdin = open(sys.stdin, 'r')
     for line in stdin:
-        c = parse_course(line.rstrip('\r\n')
-        if c is not None:
-            courses.append(c)
+        if c[0] != '#':
+            c = parse_course(line.rstrip('\r\n')
+            if c is not None:
+                courses.append(c)
     return courses
 
 def select_courses(candidates, min_credits, max_credits):
@@ -155,32 +157,17 @@ def parse_course(course_line):
     """
     parts = course_line.split('|')
     if len(parts) != COURSE_RECORD_COUNT:
-        return None
-    name = parts[0]
-    abbr = parts[1]
-    if parts[2] == 'yes':
-        taken = True
-    elif parts[2] == 'no':
-        taken = False
-    else:
-        return None
-    prereqs = parts[3].split(',')
-    coreqs = parts[4].split(',')
-    pattern = int(parts[5])
-    if parts[6] == 'yes':
-        offered = True
-    elif parts[6] == 'no':
-        offered = False
-    else:
-        return None
-    credits = int(parts[7])
-    if parts[8] == 'yes':
-        perm = True
-    elif parts[8] == 'no':
-        perm = False
-    else:
-        return None
-    prior = int(parts[9])
+        raise IndexError("'" + course_line + "' has an invalid field count")
+    name = dekky.parse.string_val(parts[0])
+    abbr = dekky.parse.string_val(parts[1])
+    taken = dekky.parse.yes_no(parts[2])
+    prereqs = dekky.parse.delimited_list(parts[3], ',')
+    coreqs = dekky.parse.delimited_list(parts[4], ',')
+    pattern = dekky.parse.int_val(parts[5])
+    offered = dekky.parse.yes_no(parts[6])
+    credits = dekky.parse.int_val(parts[7])
+    perm = dekky.parse.yes_no(parts[8])
+    prior = dekky.parse.int_val(parts[9])
     return {'name': name, 'code': abbr, 'taken': taken, 'prereqs': prereqs,
                     'coreqs': coreqs, 'pattern': pattern, 'offered': offered,
                     'credits': credits, 'permission': perm, 'impact': prior}

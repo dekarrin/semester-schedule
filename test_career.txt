@@ -1,0 +1,45 @@
+#name                           |code       |taken  |prereqs            |coreqs             |pattern|offered|credits|perm   |priority
+General Chemistry I             |CHEM-121   |no     |                   |                   |1      |yes    |3      |no     |0
+General Chemistry I Lab         |CHEM-121L  |no     |CHEM-121           |CHEM-121           |1      |yes    |1      |no     |0
+General Chemistry II            |CHEM-122   |no     |                   |                   |1      |yes    |3      |no     |0
+General Chemistry II Lab        |CHEM-122L  |no     |CHEM-122           |CHEM-122           |1      |yes    |1      |no     |0
+Fundamentals/Public Speaking    |COMM-110   |no     |                   |                   |1      |yes    |3      |no     |0
+Modern Software Development     |CSCI-213   |no     |CSCI-161           |                   |2      |yes    |3      |no     |0
+Discrete Mathematics            |CSCI-222   |yes    |CSCI-160           |                   |1      |yes    |3      |no     |0
+Software Development/Games      |CSCI-313   |no     |CSCI-213           |                   |3      |no     |3      |no     |0
+Theoretical Computer Science I  |CSCI-335   |no     |CSCI-161,CSCI-222  |                   |2      |yes    |3      |no     |0
+Theoretical Computer Science II |CSCI-336   |no     |CSCI-335           |                   |3      |yes    |3      |no     |0
+Files for Database Systems      |CSCI-366   |yes    |CSCI-336           |                   |2      |yes    |3      |no     |0
+Comparative Programming Lang    |CSCI-372   |no     |CSCI-161           |                   |1      |yes    |3      |no     |0
+Assembly Programming            |CSCI-373   |no     |CSCI-160           |                   |3      |no     |3      |no     |0
+Computer Organization/Achi      |CSCI-374   |no     |CSCI-373           |                   |1      |yes    |3      |no     |0
+Principles/Software Engineering |CSCI-413   |no     |CSCI-161           |                   |2      |yes    |3      |no     |0
+Networking/Parallel Computing   |CSCI-415   |no     |CSCI-313,CSCI-366  |                   |4      |yes    |3      |no     |0
+Intro/Artificial Intelligence   |CSCI-426   |no     |CSCI-372           |                   |3      |no     |3      |no     |0
+Software Projects Capstone      |CSCI-445   |no     |CSCI-366           |CSCI-489           |3      |no     |3      |no     |0
+Linear Programming/Network Flows|CSCI-453   |no     |MATH-265           |                   |4      |no     |3      |no     |0
+Algorithm Analysis              |CSCI-467   |no     |MATH-166,CSCI-161,CSCI-222|            |3      |no     |3      |no     |0
+Operating Systems Concepts      |CSCI-474   |no     |CSCI-374           |                   |2      |yes    |3      |no     |0
+Social Implications of Computers|CSCI-489   |no     |CSCI-372           |                   |3      |no     |3      |no     |0
+Writing in the Sciences         |ENGL-324   |no     |ENGL-120           |                   |1      |yes    |3      |no     |0
+Insects, Humans, and Environment|ENT-210    |no     |                   |                   |1      |yes    |3      |no     |0
+Wellness                        |HNES-111   |no     |                   |                   |1      |yes    |3      |no     |0
+Calculus III                    |MATH-265   |no     |MATH-166           |                   |1      |yes    |4      |no     |0
+Introduction to Psychology      |PSYC-111   |yes    |                   |                   |1      |yes    |3      |no     |0
+Human Sexuality                 |PSYC-210   |no     |PSYC-111           |                   |1      |yes    |3      |no     |0
+Statistics                      |STAT-368   |yes    |STAT-367           |                   |3      |no     |3      |no     |0
+General Biology I               |BIOL-150   |yes    |                   |                   |1      |yes    |3      |no     |0
+General Biology I Lab           |BIOL-150L  |yes    |BIOL-150           |BIOL-150           |1      |yes    |1      |no     |0
+Computer Science I              |CSCI-160   |yes    |                   |                   |1      |yes    |4      |no     |0
+Computer Science II             |CSCI-161   |yes    |CSCI-160           |                   |1      |yes    |4      |no     |0
+Self-Paced C                    |CSCI-214   |yes    |CSCI-160           |                   |1      |yes    |3      |no     |0
+College Composition I           |ENGL-110   |yes    |                   |                   |1      |yes    |3      |no     |0
+College Composition II          |ENGL-120   |yes    |ENGL-110           |                   |1      |yes    |3      |no     |0
+Second-Year French I            |FREN-201   |yes    |                   |                   |1      |yes    |5      |no     |0
+Calculus I                      |MATH-165   |yes    |                   |                   |1      |yes    |4      |no     |0
+Calculus II                     |MATH-166   |yes    |MATH-165           |                   |1      |yes    |4      |no     |0
+University Physics I            |PHYS-251   |yes    |                   |                   |1      |yes    |3      |no     |0
+University Physics I Lab        |PHYS-251L  |yes    |PHYS-251           |PHYS-251           |1      |yes    |1      |no     |0
+Old Testament                   |RELS-220   |yes    |                   |                   |1      |yes    |3      |no     |0
+Probability                     |STAT-367   |yes    |MATH-166           |                   |1      |yes    |3      |no     |0
+Skills For Academic Success     |UNIV-189   |yes    |                   |                   |1      |yes    |1      |no     |0
