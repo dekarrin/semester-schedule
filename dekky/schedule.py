@@ -51,7 +51,7 @@ def combine_eligibility_scores(elgibilities_list):
         master_eligibilities[k] = s
     return master_eligibilities
     
- def analyze_offer_schedules(courses):
+def analyze_offer_schedules(courses):
     """Score courses based on how infrequently they're offered."""
     scores = {}
     for k, c in courses.items():
@@ -117,7 +117,7 @@ def filter_courses(courses, scores):
     """
     filtered = []
     for c in courses:
-        if c['code'] in scores
+        if c['code'] in scores:
             c['impact'] += scores[c['code']]
             filtered.append(c)
     return filtered
@@ -141,14 +141,14 @@ def course_is_eligible(dep_graph, node_index):
         # gotta take prereqs or you're not eligible!
         deps = dekky.graph.get_dependencies(dep_graph[course_index], 'taken')
         deps_good = True
-        for deps as d:
+        for d in deps:
             if d not in c['coreqs']: # Assumes no indirect coreqs
                 deps_good = False
                 break
         # check that coreqs are either eligible or have already been taken
         coreqs = c['coreqs']
         cos_good = True
-        for coreqs as co:
+        for co in coreqs:
             taken = dep_graph[co]['data']['taken']
             if not taken and not course_is_eligible(dep_graph, co):
                 cos_good = False

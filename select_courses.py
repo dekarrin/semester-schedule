@@ -87,7 +87,7 @@ def main():
     """Execute the program. Call only if this module is being run from the
     interpreter.
     """
-    career = read_acedemic_career()
+    career = read_academic_career()
     candidates = build_candidate_list(career)
     semester = select_courses(candidates, MIN_CREDS, MAX_CREDS)
     write_semester_courses(semester)
@@ -97,12 +97,10 @@ def read_academic_career():
     of course dicts.
     """
     courses = list()
-    stdin = open(sys.stdin, 'r')
-    for line in stdin:
-        if c[0] != '#':
-            c = parse_course(line.rstrip('\r\n')
-            if c is not None:
-                courses.append(c)
+    for line in sys.stdin:
+        if line[0] != '#':
+            c = parse_course(line.rstrip('\r\n'))
+            courses.append(c)
     return courses
 
 def select_courses(candidates, min_credits, max_credits):
