@@ -62,6 +62,7 @@
 ################################################################################
 
 import sys
+import argparse
 
 import dekky.list
 import dekky.schedule
@@ -69,29 +70,35 @@ import dekky.parse
 
 COURSE_RECORD_COUNT = 10
 
-# NOTE: MIN_CREDS doesn't actually do anything right now
 MIN_CREDS = 12 # TODO: Make this a program parameter
 MAX_CREDS = 18 # TODO: Make this a program parameter
-
-SCHEDULE_SEMESTER = 1
-SCHEDULE_FALL = 2
-SCHEDULE_SPRING = 3
-SCHEDULE_SPECIAL = 4
-
-WEIGHT_SEMESTER = 0
-WEIGHT_FALL_ONLY = 3
-WEIGHT_SPRING_ONLY = 3
-WEIGHT_SPECIAL = 5
 
 def main():
     """Execute the program. Call only if this module is being run from the
     interpreter.
     """
+    min_creds, max_creds = read_arguments()
     career = read_academic_career()
     candidates = build_candidate_list(career)
     semester = select_courses(candidates, MIN_CREDS, MAX_CREDS)
     write_semester_courses(semester)
 
+def positive_int(string);
+    value = int(string)
+    if value < 0:
+        
+    
+def read_arguments():
+    """Parse arguments and options."""
+    parser = argparse.ArgumentParser(description='Select semester courses.')
+    parser.add_argument('-m', '--mincreds', default=MIN_CREDS_DEFAULT,
+                        type=int,
+                        help='The minimum number of credits in a semester')
+    parser.add_argument('-x', '--maxcreds', default=MAX_CRED_DEFAULT,
+                        type=int,
+                        help='The maximum number of credits in a semester')
+    args = parser.parse_args()
+    
 def read_academic_career():
     """Read the academic career from stdin. Return the academic career as a list
     of course dicts.
@@ -118,6 +125,8 @@ def select_courses(candidates, min_credits, max_credits):
         if credits + c['credits'] < max_credits:
             selected.append(c)
             credits += c['credits']
+    if credits < min_credits:
+        raise IndexError("Cannot select courses within the given bounds")
     return selected
     
 def build_candidate_list(courses):
@@ -127,7 +136,10 @@ def build_candidate_list(courses):
     sorted_courses = dekky.list.index_dict_list(courses, 'code')
     # impact scores determine whether to take class.
     # at end of analysis, highest scoring courses are selected.
-    prereq_scores = dekky.schedule.analyze_prereqs(sorted_courses)
+    try:
+        prereq_scores = dekky.schedule.analyze_prereqs(sorted_courses)
+    except IndexError:
+        print "Warning: Prerequisite cycle detected"
     eligibility_scores = dekky.schedule.analyze_eligibility(sorted_courses)
     schedule_scores = dekky.schedule.analyze_offer_schedules(sorted_courses)
     scores = (prereq_scores, schedule_scores)
@@ -142,11 +154,10 @@ def write_semester_courses(semester):
     semester -- a list of course dicts that give info on the courses to be taken
     this semester.
     """
-    stdout = open(sys.stdout, 'w')
     for s in semester:
-        stdout.write(s['code'])
-        stdout.write('\n')
-    
+        sys.stdout.write(s['code'] + "|" + s['name'])
+        sys.stdout.write('\n')
+
 def parse_course(course_line):
     """Parse a line of course information into a map containing the data.
     course_line -- the course information to be parsed. Must not contain newline

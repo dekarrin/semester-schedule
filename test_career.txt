@@ -24,7 +24,7 @@ Social Implications of Computers|CSCI-489   |no     |CSCI-372           |       
 Writing in the Sciences         |ENGL-324   |no     |ENGL-120           |                   |1      |yes    |3      |no     |0
 Insects, Humans, and Environment|ENT-210    |no     |                   |                   |1      |yes    |3      |no     |0
 Wellness                        |HNES-111   |no     |                   |                   |1      |yes    |3      |no     |0
-Calculus III                    |MATH-265   |no     |MATH-166           |                   |1      |yes    |4      |no     |0
+Calculus III                    |MATH-265   |no     |MATH-166           |                   |1      |yes    |4      |no     |-100
 Introduction to Psychology      |PSYC-111   |yes    |                   |                   |1      |yes    |3      |no     |0
 Human Sexuality                 |PSYC-210   |no     |PSYC-111           |                   |1      |yes    |3      |no     |0
 Statistics                      |STAT-368   |yes    |STAT-367           |                   |3      |no     |3      |no     |0

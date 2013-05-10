@@ -2,6 +2,16 @@
 
 import dekky.graph
 
+SCHEDULE_SEMESTER = 1
+SCHEDULE_FALL = 2
+SCHEDULE_SPRING = 3
+SCHEDULE_SPECIAL = 4
+
+WEIGHT_SEMESTER = 0
+WEIGHT_FALL = 3
+WEIGHT_SPRING = 3
+WEIGHT_SPECIAL = 5
+
 def combine_impact_scores(scores_list, eligibilities_list):
     """Combine all score dicts in scores_list and eligibilities_list. If any
     value in an eligibility score dict is negative, the corresponding value in
@@ -14,7 +24,8 @@ def combine_impact_scores(scores_list, eligibilities_list):
     scores = combine_normal_scores(scores_list)
     keys = scores.keys()
     for k in keys:
-        combined[k] = scores[k] * eligibilities[k]
+        combined[k] = (scores[k] + 1) * eligibilities[k] - 1
+        # +1, -1 hack added to make 0's go under if not eligible
     return combined
     
 def combine_normal_scores(scores_list):
@@ -32,7 +43,7 @@ def combine_normal_scores(scores_list):
         master_scores[k] = s
     return master_scores
     
-def combine_eligibility_scores(elgibilities_list):
+def combine_eligibility_scores(eligibilities_list):
     """Combine eligibility scores together. They are assumed to be either +1 or
     -1. If one of the dicts in eligibilities_list has a key that contains a
     negative value, that key will be negative in the result. All dicts must have
@@ -41,7 +52,7 @@ def combine_eligibility_scores(elgibilities_list):
     either +1 or -1.
     """
     master_eligibilities = {}
-    keys = elgibilities_list[0].keys()
+    keys = eligibilities_list[0].keys()
     for k in keys:
         s = 1
         for eligibilities in eligibilities_list:
@@ -56,13 +67,13 @@ def analyze_offer_schedules(courses):
     scores = {}
     for k, c in courses.items():
         if c['pattern'] == SCHEDULE_SEMESTER:
-            scores[k] == WEIGHT_SEMESTER
+            scores[k] = WEIGHT_SEMESTER
         elif c['pattern'] == SCHEDULE_FALL:
-            scores[k] == WEIGHT_FALL
+            scores[k] = WEIGHT_FALL
         elif c['pattern'] == SCHEDULE_SPRING:
-            scores[k] == WEIGHT_SPRING
+            scores[k] = WEIGHT_SPRING
         elif c['pattern'] == SCHEDULE_SPECIAL:
-            scores[k] == WEIGHT_SPECIAL
+            scores[k] = WEIGHT_SPECIAL
         else:
             raise ValueError
     return scores
@@ -139,7 +150,7 @@ def course_is_eligible(dep_graph, node_index):
         return True
     if not c['taken'] and c['offered']:
         # gotta take prereqs or you're not eligible!
-        deps = dekky.graph.get_dependencies(dep_graph[course_index], 'taken')
+        deps = dekky.graph.get_dependencies(dep_graph[node_index], 'taken')
         deps_good = True
         for d in deps:
             if d not in c['coreqs']: # Assumes no indirect coreqs

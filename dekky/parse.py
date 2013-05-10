@@ -25,6 +25,9 @@ def int_val(raw):
 def delimited_list(raw, delimiter):
     """Return the given string split by the delimiter."""
     parts = raw.strip().split(delimiter)
+    if len(parts) == 1 and parts[0] == '':
+        return []
     clean = []
     for p in parts:
         clean.append(string_val(p))
+    return clean

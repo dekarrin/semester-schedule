@@ -32,8 +32,8 @@ def analyze(graph):
     'cycles' -- tells whether the graph contains cycles.
     'roots' -- contains a list of all nodes that do not have any dependencies.
     """
-    info = {'roots': list()}
-    info['acyclic'] = detect_cycles(graph)
+    info = {}
+    info['acyclic'] = not detect_cycles(graph)
     info['roots'] = detect_roots(graph)
     return info
     
@@ -73,19 +73,20 @@ def detect_single_cycle(node, traversed = None):
 
 def count_dependents(node, resolution_index):
     """Return the number of nodes that depend on the given node."""
-    count = len(node['parents'])
+    count = 0
     if node['parents']:
         for d in node['parents']:
             if not d['data'][resolution_index]:
-                count += count_dependents(d)
+                count += 1
+                count += count_dependents(d, resolution_index)
     return count
 
 def get_dependencies(node, resolution_index):
     """Return all unresolved dependencies."""
-    deps = list(node['deps'])
+    deps = []
     if node['deps']:
         for d in node['deps']:
             if not d['data'][resolution_index]:
-                deps += get_dependencies(d)
-    return count
-
+                deps.append(d)
+                deps += get_dependencies(d, resolution_index)
+    return deps
