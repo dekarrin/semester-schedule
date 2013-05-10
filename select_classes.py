@@ -56,8 +56,7 @@
 import sys
 
 import dekky.list
-import dekky.graph
-import dekky.schedule.impacts
+import dekky.schedule
 
 COURSE_RECORD_COUNT = 8
 
@@ -105,116 +104,13 @@ def select_courses(classes, min_credits, max_credits):
     sorted_courses = dekky.list.index_dict_list(classes, 'code')
     # impact scores determine whether to take class.
     # at end of analysis, highest scoring courses are selected.
-    prereq_scores = analyze_prereqs(sorted_courses)
-    eligibility_scores = analyze_eligibility(sorted_courses)
-    schedule_scores = analyze_offer_schedules(sorted_courses)
-    combine_scores((prereq_scores, combine_scores), (eligibility_scores))
+    prereq_scores = dekky.schedule.analyze_prereqs(sorted_courses)
+    eligibility_scores = dekky.schedule.analyze_eligibility(sorted_courses)
+    schedule_scores = dekky.schedule.analyze_offer_schedules(sorted_courses)
+    scores = (prereq_scores, schedule_scores)
+    eligibilities = (eligibility_scores,)
+    combined = dekky.schedule.combine_impact_scores(scores, eligibilities)
     return selected
-
-def combine_scores(scores_list, eligibilities_list):
-    """Combine all score dicts in scores_list and eligibilities_list. If any
-    value in an eligibility score dict is negative, the corresponding value in
-    the resulting score list will also be negative. All score dicts in both
-    scores_list and eligibilities_list must have the exact same keys.
-    Return the combined impact scores of courses.
-    """
-    combined = {}
-    eligibilities = combine_eligibility_scores(eligibilities_list)
-    scores = combine_normal_scores(scores_list)
-    keys = scores.keys()
-    for k in keys:
-        combined[k] = scores[k] * eligibilities[k]
-    return combined
-        
-def combine_normal_scores(scores_list):
-    """Combine scores together. Each key in the dicts of scores_list is added
-    together. All score dicts in scores_list must have the exact same keys, and
-    all score dicts are assumed to only have values greater than or equal to 0.
-    Return the combined impact scores.
-    """
-    master_scores = {}
-    keys = scores_list[0].keys()
-    for k in keys:
-        s = 0
-        for scores in scores_list:
-            s += scores[k]
-        master_scores[k] = s
-    return master_scores
-    
-def combine_eligibility_scores(elgibilities_list):
-    """Combine eligibility scores together. They are assumed to be either +1 or
-    -1. If one of the dicts in eligibilities_list has a key that contains a
-    negative value, that key will be negative in the result. All dicts must have
-    the exact same keys.
-    Return the calulated combined eligibility scores. Each key will contain
-    either +1 or -1.
-    """
-    master_eligibilities = {}
-    keys = elgibilities_list[0].keys()
-    for k in keys:
-        s = 1
-        for eligibilities in eligibilities_list:
-            if eligibilities[k] < 0:
-                s = -1
-                break
-        master_eligibilities[k] = s
-    return master_eligibilities
-
-def analyze_offer_schedules(courses):
-    """Score courses based on how infrequently they're offered."""
-    scores = {}
-    for k, c in courses.items():
-        if c['pattern'] == SCHEDULE_SEMESTER:
-            scores[k] == WEIGHT_SEMESTER
-        elif c['pattern'] == SCHEDULE_FALL:
-            scores[k] == WEIGHT_FALL
-        elif c['pattern'] == SCHEDULE_SPRING:
-            scores[k] == WEIGHT_SPRING
-        elif c['pattern'] == SCHEDULE_SPECIAL:
-            scores[k] == WEIGHT_SPECIAL
-        else:
-            raise ValueError
-    return scores
-
-def analyze_eligibility(courses):
-    """Return a list scores that indicate elibility. 1 indicates elibible, -1
-    indicates inelibilty.
-    """
-    scores = {}
-    pre_graph = dekky.graph.create_dep_graph(courses, 'prereqs')
-    for k, c in courses.items():
-        if not c['taken'] and c['offered']:
-            # gotta take prereqs or you're not eligible!
-            deps = dekky.graph.get_dependencies(pre_graph[k], 'taken')
-            is_co = True
-            for deps as d:
-                if d not in c['coreqs']: # Assumes no indirect coreqs
-                    is_co = False
-                    break
-            if not deps or is_co:
-                scores[k] = 1
-            else:
-                scores[k] = -1
-        else:
-            scores[k] = -1
-    return scores
-
-def analyze_prereqs(courses):
-    """Analyze the prerequisites of courses and assigns impact scores to each
-    course based on how many other courses depend on it.
-    courses -- the courses to analyze. Must be a dict of course codes to course
-    dicts.
-    Return a dictionary with the course impact scores of this analysis.
-    """
-    prereqs_graph = dekky.graph.create_dep_graph(courses, 'prereqs')
-    prereqs_info = dekky.graph.analyze(prereqs_graph)
-    if not prereqs_info['acyclic']:
-        raise IndexError
-    scores = {}
-    for k in prereqs_graph:
-        node = prereqs_graph[k]
-        scores[k] = dekky.graph.count_dependents(node, 'taken')
-    return scores
 
 def write_semester_courses(semester):
     """Write the given courses to stdout.
